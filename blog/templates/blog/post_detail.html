@@ -14,7 +14,7 @@
         <h1>{{ post.title }}</h1>
         <p>{{ post.text|linebreaksbr }}</p>
         {% if post.img_url %}
-        <img src="{{ post.img_url }}"/>
+        <img width='100%' src="{{ post.img_url }}"/>
         {% endif %}
     </div>
 {% endblock %}
