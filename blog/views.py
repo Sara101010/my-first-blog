@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import Post
 from django.utils import timezone
 from .forms import PostForm
+from .forms import CommentForm
 
 # Create your views here.
 def post_list(request):
@@ -10,7 +11,7 @@ def post_list(request):
 
 def post_detail(request, pk):
     post = get_object_or_404(Post, pk=pk)
-    return render(request, 'blog/post_detail.html', {'post': post})
+    return render(request, 'blog/post_detail.html', {'post': post, 'comments': post.comments.all()})
 
 def post_new(request):
     if request.method == "POST":
@@ -43,3 +44,17 @@ def post_delete(request, pk):
     post = get_object_or_404(Post, pk=pk)
     post.delete()
     return post_list(request)
+
+def new_comment(request, pk):
+    if request.method == "POST":
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            post = get_object_or_404(Post, pk=pk)
+            comment = form.save(commit=False)
+            comment.author = request.user
+            comment.post = post
+            comment.save()
+            return redirect('post_detail', pk=post.pk)
+    else:
+        form = CommentForm()
+    return render(request, 'blog/post_edit.html', {'form': form})
